@@ -1,2 +1,16 @@
 <router-outlet></router-outlet>
 <main>Home</main>
+<!-- <input (change)="createTplModal($event)" type="file" /> -->
+
+<!-- <input type="file" (change)="createTplModal($event)" /> -->
+
+<div>
+  <input type="number" [formControl]="indexFocus" placeholder="Nhập index focus">
+  <button #focusButton (click)="focusInput(indexFocus.value!)">Submit</button>
+</div>
+<cdk-virtual-scroll-viewport itemSize="50" style="height: 300px; overflow-y: scroll; border: 1px solid #000;">
+  <div *ngFor="let item of testArr; let i = index">
+    <label for="">stt {{i}}</label>
+    <input #inputField type="text" placeholder="">
+  </div>
+</cdk-virtual-scroll-viewport>

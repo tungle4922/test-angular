@@ -1,4 +1,11 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import {
@@ -12,20 +19,50 @@ import {
   of,
   switchMap,
 } from 'rxjs';
-import { LoadingService } from './modules/loading/services/loadingService.service';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { ImageCropComponent } from './modules/upload/components/image-crop/image-crop.component';
+import {
+  ImageCroppedEvent,
+  ImageCropperModule,
+  LoadedImage,
+} from 'ngx-image-cropper';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import {
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    NzModalModule,
+    ImageCropperModule,
+    ScrollingModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
   title = 'test-angular';
   arr: number[] = [];
+  _nzModalService = inject(NzModalService);
+  imageChangedEvent: any = '';
+  croppedImage: any = '';
+  testArr: any = Array(100);
 
-  ngOnInit() {}
+  constructor(private sanitizer: DomSanitizer) {}
+
+  ngOnInit() {
+    this.limitValueInput()
+  }
 
   //Trường hợp tính tổng 3 số dạng observable
   getSumObserve(): Observable<number> {
@@ -87,5 +124,37 @@ export class AppComponent {
     interval(1000)
       .pipe(concatMap((value) => of(`ConcatMap: ${value}`)))
       .subscribe((result) => console.log(result));
+  }
+
+  createTplModal($event: any): void {
+    this._nzModalService.create({
+      nzTitle: 'Img crop',
+      nzContent: ImageCropComponent,
+      nzData: {
+        data: $event,
+      },
+      nzOnOk: () => console.log('Click ok'),
+    });
+  }
+
+  //focus input in arr
+  @ViewChildren('inputField') inputFields: QueryList<ElementRef> | undefined;
+  @ViewChild('focusButton') focusButton: ElementRef | undefined;
+  indexFocus = new FormControl(0);
+
+  focusInput(index: number) {
+    const sixthInput = this.inputFields?.toArray()[index]; // Lấy input thứ 6 (vị trí 5 vì index bắt đầu từ 0)
+    sixthInput?.nativeElement.focus(); // Focus vào input
+  }
+
+  limitValueInput() {
+    this.indexFocus.valueChanges.subscribe((value) => {
+      if (value && value > 99) {
+        this.indexFocus.setValue(99);
+      }
+      if (value && value < 0) {
+        this.indexFocus.setValue(0);
+      }
+    });
   }
 }

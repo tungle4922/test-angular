@@ -1,0 +1,11 @@
+<div class="w-full flex justify-center">
+  <image-cropper
+    [imageChangedEvent]="nzModalData.data"
+    [maintainAspectRatio]="false"
+    [aspectRatio]="4 / 3"
+    format="png"
+    (imageCropped)="imageCropped($event)"
+    (imageLoaded)="imageLoaded()"
+    (loadImageFailed)="loadImageFailed()"
+  ></image-cropper>
+</div>
